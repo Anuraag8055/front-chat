@@ -31,6 +31,8 @@ const ChatPage = () => {
   const inputRef = useRef(null);
   const chatBoxRef = useRef(null);
 
+  
+
   // Check connection and redirect if not connected
   useEffect(() => {
     if (!connected) {
@@ -213,7 +215,7 @@ const ChatPage = () => {
         </header>
   
         {/* Main Chat Content */}
-        <div className="flex flex-col md:flex-row gap-6 px-6 py-4">
+        <div className="flex flex-col md:flex-row gap-6 px-6 py-4 ">
   
           {/* Chat Messages */}
           <div className="w-full md:w-3/4 h-[400px] bg-gray-50 rounded-lg overflow-y-auto p-4 shadow-sm">
@@ -228,7 +230,7 @@ const ChatPage = () => {
                   <div
                     className={`relative p-3 rounded-lg max-w-xs md:max-w-md ${message.sender === currentUser ? "bg-green-800" : "bg-gray-800"}`}
                   >
-                    {room?.adminUser === currentUser && (
+                    {room?.adminUser === currentUser && !message.deleted &&(
                       <button
                         onClick={() => deleteMessage(message.id)}
                         className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-700 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
@@ -238,19 +240,29 @@ const ChatPage = () => {
                       </button>
                     )}
                     <div className="flex gap-3">
+                    {!message.deleted && (
                       <img
                         className="h-10 w-10 rounded-full"
                         src={`https://avatar.iran.liara.run/public/?username=${message.sender}`}
                         alt={message.sender}
                       />
+                      )}
                       <div>
-                        <p className="font-bold text-sm flex items-center gap-1 text-white">
-                          {message.sender}
-                          {room?.adminUser === message.sender && (
-                            <span className="text-xs bg-blue-500 px-1 rounded">Admin</span>
-                          )}
-                        </p>
-                        <p className="text-white">{message.content}</p>
+                        {message.deleted ? (
+                          <p className="text-gray-400 italic">This message was deleted by an admin.</p>
+                        ) : (
+                          <>
+                            <p className="font-bold text-sm flex items-center gap-1 text-white">
+                              {message.sender}
+                              {room?.adminUser === message.sender && (
+                                <span className="text-xs bg-blue-500 px-1 rounded">Admin</span>
+                              )}
+                            </p>
+                            {/* Step 3: Check if message is deleted and show placeholder */}
+
+                            <p className="text-white">{message.content}</p>
+                          </>
+                        )}
                         <p className="text-xs text-gray-400 mt-1">
                           {timeAgo(message.timeStamp)}
                         </p>
@@ -279,15 +291,15 @@ const ChatPage = () => {
                           <span className="ml-1 text-xs bg-blue-500 px-1 rounded">Admin</span>
                         )}
                       </span>
-                    </div>
                     {room?.adminUser === currentUser && room?.adminUser !== user && (
                       <button
-                        onClick={() => removeUser(user)}
-                        className="text-xs bg-red-500 hover:bg-red-700 px-1 rounded"
+                      onClick={() => removeUser(user)}
+                      className="text-xs bg-red-500 hover:bg-red-700 px-1 rounded"
                       >
                         Remove
                       </button>
                     )}
+                    </div>    
                   </li>
                 ))}
             </ul>
@@ -305,7 +317,7 @@ const ChatPage = () => {
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               type="text"
               placeholder="Type your message..."
-              className="flex-1 bg-transparent border-none focus:outline-none text-white px-3 py-2"
+              className="flex-1 bg-transparent border-none focus:outline-none text-green px-3 py-2"
             />
             <div className="flex gap-2">
               <button
